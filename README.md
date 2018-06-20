@@ -1,7 +1,8 @@
 Respositório para trabalhos da disciplina de compiladores.
 
-Se usar o sublime eis os build system's que estou utilizando
+Se usar o sublime eis os build system's que estou utilizando:
 
+```
 "build_systems":
     [
         {
@@ -18,3 +19,4 @@ Se usar o sublime eis os build system's que estou utilizando
             "selector": "source.cpp"
         }
     ]
+```
