@@ -23,7 +23,8 @@ Token Lexer::Scan()
 	{
 		if (peek == '\n')
 			line += 1;
-		peek = cin.get();
+		// peek = fileExp.get();
+		fileExp >> peek;
 	}
 
 	// retorna números
@@ -36,7 +37,8 @@ Token Lexer::Scan()
 			// converte 'n' para o dígito numérico n
 			int n = peek - '0';
 			v = 10 * v + n;
-			peek = cin.get();
+			// peek = fileExp.get();
+			fileExp >> peek;
 		} 
 		while (isdigit(peek));
 
@@ -47,12 +49,20 @@ Token Lexer::Scan()
 	// retorna palavras-chave e identificadores
 	if (isalpha(peek))
 	{
+		if (peek=='/') {
+			// peek = fileExp.get();
+			fileExp >> peek;
+			if (peek == '/') {
+
+			}
+		}
 		stringstream ss;
 
 		do 
 		{
+			
 			ss << peek;
-			peek = cin.get();
+			peek = fileExp.get();
 		} 
 		while (isalpha(peek));
 
@@ -84,10 +94,19 @@ Token Lexer::Scan()
 	return t;
 }
 
-void Lexer::Start()
+void Lexer::Start(string fileName)
 {
-	while (peek != '\n')
-		Scan();
+	fileExp.open(fileName);
+
+	if (!fileExp.is_open()) {
+        cerr << "\n\t\tArquivo inválido!\n\n";           
+    } else {
+		// while (fileExp >> peek)
+		while (peek != '/n')
+			Scan();
+    }
+
+	fileExp.close();
 }
 
 

@@ -1,5 +1,9 @@
+#include <fstream>
 #include <unordered_map>
 #include <string>
+#include <stdlib.h>
+
+using std::ifstream;
 using std::unordered_map;
 using std::string;
 
@@ -29,11 +33,12 @@ class Lexer
 private:
 	int  line = 1;
 	char peek = ' ';
+	ifstream fileExp;
 	unordered_map<string, Id> id_table;
 	void Reserve(Id w);
 
 public:
 	Lexer();
 	Token Scan();
-	void Start();
+	void Start(string fileName);
 };
