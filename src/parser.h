@@ -14,31 +14,50 @@ class Parser
 {
 private:
 
-	
-	// char lookahead;
 	Token * lookahead;
-	Symbol * found;
 	Lexer analex;
-	// Env rootScope;
+	Symbol * found;
 	Env * scope;
 
-	bool init = true;
+	bool init = true;	// para fins de inicialização
 
-	void Program();
-	void Block();
-	void Decls();
-	void Stmts();
-	void Decl();
-	void Stmt();
-	void Expr();
 
-	void Term();
-	void Factor();
+						
+						
+						
+						
+						
+						
+						
 
-	void Oper1();
-	void Oper2();
 
+
+
+
+
+	void Program();	//	->	expression block
+	void Block();	//	->	{ decls stmts }
+	void Decls();	//	->	decl decls
+					//	|	ε
+	void Decl();	//	->	type id;
+	void Stmts();	//	->	stmt stmts
+					//	|	ε
+	void Stmt();	//	->	block
+					//	|	expr;
+	void Expr();	//	->	term oper1
+	void Oper1();	//	->	+ term oper1
+					//	|	– term oper1
+					//	|	ε				
+	void Term();	//	->	factor oper2
+	void Oper2();	//	->	* factor oper2
+					//	|	/ factor oper2
+					//	|	ε
+	void Factor();	//	->	(expr)
+					//	|	num
+					//	|	id
+	
 	void Match(char t);
+	void Match(char t, int line);
 
 public:
 	Parser();

@@ -14,7 +14,14 @@ void Parser::Match(char t)
 	if (t == lookahead->tag)
 		lookahead = analex.Scan();
 	else
-		throw "Erro de sintaxe na linha: " + to_string(analex.getLine()) + "\nEsperava-se '"+t+" encontrado '" + to_string(lookahead->tag) + "'\n";
+		throw "Erro de sintaxe na linha: " + to_string(analex.getLine()) + "\nEsperava-se '"+t+"'\n";
+}
+void Parser::Match(char t,int line)
+{
+	if (t == lookahead->tag)
+		lookahead = analex.Scan();
+	else
+		throw "Erro de sintaxe na linha: " + to_string(line) + "\nEsperava-se '"+t+"'\n";
 }
 
 void Parser::Program() {
