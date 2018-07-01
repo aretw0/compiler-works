@@ -59,7 +59,7 @@ Lexer::Lexer()
 }
 
 void Lexer::Clear() {
-	// salta espaços em branco, tabulações e novas linhas
+	// salta espaï¿½os em branco, tabulaï¿½ï¿½es e novas linhas
 	while (isspace(peek))
 	{
 		if (peek == '\n')
@@ -92,18 +92,20 @@ Token * Lexer::Scan()
 	Clear();
 	CleanComm();
 
-	// retorna números
+	// retorna nï¿½meros
 	if (isdigit(peek))
 	{	
 		stringstream ss;
+		bool doFloat = false;
 		do 
 		{
-			// captura um string numérica
+			// captura um string numï¿½rica
 			ss << peek;
 			
 			peek = fileExp.get();
 
-			if (peek == '.' && isdigit(fileExp.peek())) {
+			if ((peek == '.') && (isdigit(fileExp.peek())) && (!doFloat)) {
+				doFloat = true;
 				ss << peek;
 				peek = fileExp.get();
 			}
@@ -167,7 +169,7 @@ Token * Lexer::Scan()
 		// return &tkLex;
 	}
 
-	// retorna operadores (e caracteres não alphanuméricos isolados)
+	// retorna operadores (e caracteres nï¿½o alphanumï¿½ricos isolados)
 	// tkLex{ peek };
 	// peek = ' ';
 	// cout << "<" << char(t.tag) << "> ";
@@ -185,7 +187,7 @@ void Lexer::Start(string fileName)
 	// fileExp = file;
 
 	/*if (!fileExp.is_open()) {
-        cerr << "\n\t\tArquivo inválido!\n\n";           
+        cerr << "\n\t\tArquivo invï¿½lido!\n\n";           
     } else {
 		// while (fileExp >> peek)
 		while (peek != '/n')

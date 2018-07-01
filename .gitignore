@@ -30,4 +30,3 @@
 *.sublime-project
 
 compiladores\.sublime-workspace
-.vscode/launch.json

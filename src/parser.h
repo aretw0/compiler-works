@@ -20,7 +20,7 @@ private:
 	Symbol * found;
 	Lexer analex;
 	// Env rootScope;
-	Env scope;
+	Env * scope;
 
 	bool init = true;
 
