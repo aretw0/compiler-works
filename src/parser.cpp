@@ -50,7 +50,7 @@ void Parser::Block() {
 	// voltar pra antigo escopo
 	scope = saved;
 
-	Match('}'); // Para come�ar certo
+	Match('}'); // Para começar certo
 	// voltar para o escopo anterior
 }
 
@@ -66,12 +66,13 @@ void Parser::Decls() {
 
 void Parser::Decl(){
 	Id type = *(Id*)lookahead;
-	// string tipo = type->name;
+	int actuaLine = analex.getLine();
 	lookahead = analex.Scan();
 	if (lookahead->tag == ID){
 		Id id = *(Id*)lookahead;
+		actuaLine = analex.getLine();
 		lookahead = analex.Scan();
-		Match(';');
+		Match(';',actuaLine);
 
 		// Eis o momento de carregar as vari�veis na tabela de simbolos
 
@@ -80,11 +81,11 @@ void Parser::Decl(){
 		if(!scope->search(id.name)) {
 			scope->put(id.name,s);
 		} else {
-			throw "Erro de sintaxe na linha: " + to_string(analex.getLine()) + "\nDeclara��o '"+id.name+"' duplicada no escopo\n";			
+			throw "Erro de sintaxe na linha: " + to_string(actuaLine) + "\nDeclaração '"+id.name+"' duplicada no escopo\n";			
 		}
 
 	} else {
-		throw "Erro de sintaxe na linha: " + to_string(analex.getLine()) + "\nDeclara��o '"+type.name+"' incompleta\n";
+		throw "Erro de sintaxe na linha: " + to_string(actuaLine) + "\nDeclaração '"+type.name+"' incompleta\n";
 	}
 }
 
@@ -106,18 +107,14 @@ void Parser::Stmts(){
 }
 
 void Parser::Stmt(){
-	// lookahead = analex.Scan();
-	// cout << "Chegou aqui stmt entrada";
 	if ('{' == lookahead->tag) {
 		Block(); // decompondo para o proximo
 	} else {
+		int lastLine = analex.getLine();
 		Expr(); // decompondo para o proximo
-		Match(';'); // terminando certo
-		// cout << "Chegou aqui expr saida";
+		Match(';',lastLine); // terminando certo
 		cout << endl;
-		// cout << "Chegou aqui o barra n";
 	}
-	// cout << "Chegou aqui stmt saida";
 }
 
 void Parser::Expr()
@@ -171,11 +168,11 @@ void Parser::Factor() {
 	switch (lookahead->tag) {
 		case ID:
 			{
-				// procurar nos escopos e cuspir informa��es
+				// procurar nos escopos informaçõees
 				Id i = *(Id*)lookahead;
-				// ver se tem operador para cuspir e o fazer
+				// ver se tem operador e o mostrar-lo
 				found = scope->get(i.name);
-				if (!found) { // adicionar conclusao que foi declarada
+				if (!found) { // conclusao que foi declarada
 					throw "Erro de sintaxe na linha: "+ to_string(analex.getLine()) + "\n" + i.name + " foi declarada?\n";
 				} else {
 					cout << '(' << found->classtype << ':' << found->name << ")";
@@ -185,7 +182,7 @@ void Parser::Factor() {
 			}
 		case NUM:
 			{
-				// cuspir informa��es
+				// informações
 				Num n = *(Num*)lookahead;
 				cout << '(' << n.value << ')';
 				// ver se tem operador para cuspir e o fazer

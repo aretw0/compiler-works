@@ -31,6 +31,8 @@ class Lexer
 {
 private:
 	int  line = 1;
+	int col = 1;
+	int lastCol = 1;
 	char peek = ' ';
 
 	struct {
@@ -39,30 +41,22 @@ private:
 		Id i;
 	}
 	token;
-
-	// Token tkLex;
 	
 	ifstream fileExp;
-
 	unordered_map<string, Id> id_table;
+
 	void Reserve(Id w);
+	void Clear();  				// limpar tabulações, espaços e novas linhas;
+	void CleanComm();			// limpar comentários
 
 public:
 	Lexer();
 	Token* Scan();
-	// Token Scan();
-	void Start(string fileName);
-	void Stop();
-	void Clear();
-	void CleanComm();
-	int getLine();
-	// char getPeek();
-	string getStep();
+	void Start(string fileName);	// inicializador
+	void Stop(); 					// fecha o arquivo
+	int getLine();					// retorna linha atual
+	int getCol();					// retorna coluna atual
+	int getLastCol();					// retorna ultima coluna
 
-	char getNext(char before);
-	void ignoreLineComm(char before);
-	void ignoreBlockComm(char before);
-	void verifyEnd(char before);
-
-	string dumpFile();
+	string dumpFile();				// retorna todo conteúdo do arquivo
 };
