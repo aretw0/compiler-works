@@ -14,12 +14,13 @@ using namespace std;
 class Tradutor
 {
 private:
-	ifstream fileExp;
+	// ifstream fileExp;
 	// Lexer analex;
 	// Parser anasin;	
 public:
 	Tradutor(int argc, char* argv[]);
 	Tradutor();
-	void Start(int argc, char* argv[]);
+	void Init(int argc, char* argv[]);
+	void Start(ifstream fileExp);
 	void showUsage(string name,bool flag);
 };

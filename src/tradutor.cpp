@@ -1,6 +1,5 @@
 #include "tradutor.h"
 
-
 void Tradutor::showUsage(string name, bool flag)
 {
     string usage =  "Uso: " + name + " [ <opções> | SOURCE.exp ]\nOpções:\n\t-h,--help\t\tMostra esta mensagem de ajuda\n\n";
@@ -15,17 +14,17 @@ void Tradutor::showUsage(string name, bool flag)
 Tradutor::Tradutor() {
     // analexico();
     // analsin();
-    // fileExp();
+    // fileExp(); // acho que nao usa ele aqui
 }
 
 
 Tradutor::Tradutor(int argc, char* argv[]) {
     // analexico();
     // analsin();
-    // fileExp();
-    Start(argc,argv);
+    // fileExp(); // também não
+    Init(argc,argv);
 }
-void Tradutor::Start(int argc, char* argv[]) {	
+void Tradutor::Init(int argc, char* argv[]) {	
 
  	// Checando o número de parâmetros
     if (argc == 1) {
@@ -55,8 +54,8 @@ void Tradutor::Start(int argc, char* argv[]) {
         }
 
         // cout << "Nome de arquivo com extensão válida!\n";
-
-        fileExp.open(args1);
+        ifstream fileExp(args1);
+        // fileExp.open(args1);
 
         if (!fileExp.is_open()) {
             cerr << "\n\t\tArquivo inválido!\n\n";
@@ -66,6 +65,8 @@ void Tradutor::Start(int argc, char* argv[]) {
         }
 
         cout << "\n\t\tArquivo válido!\n\n";
+
+        
 
         /*string contentFile = "";
         string contentLine;
@@ -95,6 +96,10 @@ void Tradutor::Start(int argc, char* argv[]) {
         cout << "\nResultado: \n\n" << contentFile << endl;
         */
 
-        fileExp.close();
+        // fileExp.close();
     }
+}
+
+Tradutor::Start(ifstream fileExp) {
+
 }
