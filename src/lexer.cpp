@@ -10,10 +10,6 @@ int Lexer::getLine() {
 	return line;
 }
 
-string Lexer::getStep(){
-	return line + " com " + peek;
-}
-
 char Lexer::getNext(char before) {
 	char next = fileExp.get();
 	verifyEnd(before);
