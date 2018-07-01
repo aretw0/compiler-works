@@ -12,7 +12,7 @@ void Env::put(string s, Symbol sym) {
 }
 
 Symbol * Env::get(string s) {
-	for (Env * e = this; e != NULL; e = e->prev) {
+	for (Env * e = this; e; e = e->prev) {
 		auto pos = e->scope_table.find(s);
 
 		if (pos != e->scope_table.end()) {
@@ -22,10 +22,14 @@ Symbol * Env::get(string s) {
 		}
 	}
 	return NULL;
-}  
+}
 
+bool Env::search(string s) {
 
+	auto pos = this->scope_table.find(s);
 
-/*int main(int argc, char* argv[]) {
-
-}*/
+	if (pos != this->scope_table.end()) {
+		return true;
+	}
+	return false;
+}

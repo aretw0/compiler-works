@@ -10,7 +10,6 @@ struct Symbol{
     Symbol(string n, string c): name(n), classtype(c) {}
 };
 
-
 class Env 
 {
 private: 
@@ -20,6 +19,7 @@ private:
 public:
    Env(Env * p);
    Env();
+   bool search(string s);
    void put(string s, Symbol sym);
    Symbol * get(string s);
 };

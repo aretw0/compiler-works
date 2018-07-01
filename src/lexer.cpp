@@ -2,64 +2,29 @@
 #include <iostream>
 #include <sstream>
 
-void Lexer::Reserve(Id w)
-{
-	id_table[w.name] = w;
-}
-int Lexer::getLine() {
-	return line;
-}
-
-string Lexer::getStep(){
-	return line + " com " + peek;
-}
-
-char Lexer::getNext(char before) {
-	char next = fileExp.get();
-	verifyEnd(before);
-	return next;
-}
-void Lexer::ignoreLineComm(char before) {
-	// cout << fileExp.getLine();
-	fileExp.ignore(256,'\n');
-	// verifyEnd(before);
-	++line;
-}
-
-void Lexer::ignoreBlockComm(char before) {
-	char next;
-	while (true) {
-		next = fileExp.get();
-		if (next == '*') {
-			next = fileExp.peek();
-			if (next == '/'){
-				next = fileExp.get();
-				break;
-			}
-		} else if (next == '\n') {
-			++line;
-		} else if (fileExp.eof()) {
-			break;
-		}
-	}
-}
-
-void Lexer::verifyEnd(char before) {
-	if (fileExp.eof()) {
-		Stop();
-		throw "Erro de sintaxe: Fim do arquivo em linha: " + to_string(line) + " com " + before;
-	}
-}
-
 Lexer::Lexer()
 {
 	Reserve(Id{ Tag::EXPRESSION, "expression" });
 	Reserve(Id{ Tag::TYPE, "int" });
 	Reserve(Id{ Tag::TYPE, "float" });
 }
+int Lexer::getLine() {
+	return line;
+}
+int Lexer::getCol() {
+	return col;
+}
+int Lexer::getLastCol(){
+	return lastCol;
+}
+
+void Lexer::Reserve(Id w)
+{
+	id_table[w.name] = w;
+}
 
 void Lexer::Clear() {
-	// salta espaços em branco, tabulações e novas linhas
+	// salta espaï¿½os em branco, tabulaï¿½ï¿½es e novas linhas
 	while (isspace(peek))
 	{
 		if (peek == '\n')
@@ -70,16 +35,39 @@ void Lexer::Clear() {
 
 void Lexer::CleanComm() {
 	while (peek == '/') {
+		++col;
+		int lastLine = line;
 		char next = fileExp.peek();
 		if (next == '/') {
-			// cout << "\nIgnorando comentario de linha!\n";
-			ignoreLineComm(peek);
-			peek = fileExp.get();
+			// Ignorando comentario de linha 
+			fileExp.ignore(256,'\n');
+			++line;
+			lastCol = col;
+			col = 1;
+			peek = ' ';
 			Clear();
 		} else if (next == '*') {
-			// cout << "\nIgnorando comentario de bloco!\n";
-			ignoreBlockComm(peek);
-			peek = fileExp.get();
+			// Ignorando comentario de bloco
+			char temp;
+			while (true) {
+				temp = fileExp.get();
+				++col;
+				if (temp == '*') {
+					temp = fileExp.peek();
+					if (temp == '/'){
+						temp = fileExp.get();
+						++col;
+						break;
+					}
+				} else if (temp == '\n') {
+					++line;
+					lastCol = col;
+					col = 1;
+				} else if (fileExp.eof()) {
+					throw "Erro de sintaxe na linha: " + to_string(lastLine)+"\nBloco de comentÃ¡rio aberto";
+				}
+			}
+			peek = ' ';
 			Clear();
 		} else {
 			break;
@@ -87,23 +75,37 @@ void Lexer::CleanComm() {
 	}
 }
 
+void Lexer::Start(string fileName)
+{
+	fileExp.open(fileName);
+    if (!fileExp.is_open()) {
+        throw "Arquivo " + fileName + " inexistente";
+    }
+}
+
+void Lexer::Stop() {
+	fileExp.close();
+}
+
 Token * Lexer::Scan()
 {
 	Clear();
 	CleanComm();
 
-	// retorna números
+	// retorna nÃºmeros
 	if (isdigit(peek))
 	{	
 		stringstream ss;
+		bool doFloat = false;
 		do 
 		{
-			// captura um string numérica
+			// captura um string numÃ©rica
 			ss << peek;
 			
 			peek = fileExp.get();
 
-			if (peek == '.' && isdigit(fileExp.peek())) {
+			if ((peek == '.') && (isdigit(fileExp.peek())) && (!doFloat)) {
+				doFloat = true;
 				ss << peek;
 				peek = fileExp.get();
 			}
@@ -111,8 +113,6 @@ Token * Lexer::Scan()
 		while (isdigit(peek));
 
 		string s = ss.str();
-
-		// cout << "\nDigito " << s << '\n';
 
 		Num m{stof(s)}; // utiliza stof para converter para float
 		token.n = m;
@@ -136,24 +136,10 @@ Token * Lexer::Scan()
 
 		string s = ss.str();
 
-		// cout << "\nAlpha " << s << endl;
-
 		auto pos = id_table.find(s);
 
 		if (pos != id_table.end())
 		{
-			/*switch (pos->second.tag)
-			{
-				case EXPRESSION: cout << "<" << "EXPRESSION" << "," << pos->second.name << "> "; 
-					break;
-				case TYPE: cout << "<" << "TYPE" << "," << pos->second.name << "> ";
-					break;
-				case NUM: cout << "<" << "NUM" << "," << pos->second.name << "> ";
-					break;
-				default: cout << "<" << "ID" << "," << pos->second.name << "> ";
-					break;
-			// }*/
-
 			token.i = pos->second;
 			
 		} else {
@@ -162,49 +148,13 @@ Token * Lexer::Scan()
 			token.i = w;
 		}
 		return &token.i;
-		// tkLex = w;
-		// cout << "<" << "ID" << "," << w.name << "> ";
-		// return &tkLex;
 	}
 
-	// retorna operadores (e caracteres não alphanuméricos isolados)
-	// tkLex{ peek };
-	// peek = ' ';
-	// cout << "<" << char(t.tag) << "> ";
-	// return &tkLex;
-	// cout << "\nOutros: " << peek << endl;
+	// retorna operadores (e caracteres nÃ£o alphanumÃ©ricos isolados)
 	Token t{ peek };
 	token.t = t;
 	peek = ' ';
-	// cout << "<" << char(t.tag) << "> ";
 	return &token.t;
-}
-
-void Lexer::Start(string fileName)
-{
-	// fileExp = file;
-
-	/*if (!fileExp.is_open()) {
-        cerr << "\n\t\tArquivo inválido!\n\n";           
-    } else {
-		// while (fileExp >> peek)
-		while (peek != '/n')
-			Scan();
-    }*/
-
-	// fileExp.close();
-
-	 fileExp.open(fileName);
-
-    if (!fileExp.is_open()) {
-        // exit(EXIT_FAILURE);
-        throw "Arquivo " + fileName + " inexistente";
-        // return 1;
-    }
-}
-
-void Lexer::Stop() {
-	fileExp.close();
 }
 
 string Lexer::dumpFile() {

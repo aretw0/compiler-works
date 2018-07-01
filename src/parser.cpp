@@ -14,36 +14,43 @@ void Parser::Match(char t)
 	if (t == lookahead->tag)
 		lookahead = analex.Scan();
 	else
-		throw "Erro de sintaxe na linha: " + to_string(analex.getLine()) + "\nEsperava-se '"+t+" encontrado '" + to_string(lookahead->tag) + "'\n";
+		throw "Erro de sintaxe na linha: " + to_string(analex.getLine()) + "\nEsperava-se '"+t+"'\n";
+}
+void Parser::Match(char t,int line)
+{
+	if (t == lookahead->tag)
+		lookahead = analex.Scan();
+	else
+		throw "Erro de sintaxe na linha: " + to_string(line) + "\nEsperava-se '"+t+"'\n";
 }
 
 void Parser::Program() {
-	if (lookahead->tag == EXPRESSION) { // Para Começar certo
+	if (lookahead->tag == EXPRESSION) { // Para Comeï¿½ar certo
 		lookahead = analex.Scan(); // inicia arquivo a dentro
+		scope = new Env();
 		Block(); // decompondo para o proximo	
 	} else {
 		throw "Erro de sintaxe na linha: " + to_string(analex.getLine()) + "\nDeve-se iniciar com 'expression'\n";
 	}
 }
 void Parser::Block() {
-	Match('{'); // Para começar certo
+	Match('{'); // Para comeï¿½ar certo
 	// reservar novo escopo
-	Env * saved = &scope;
+	Env * saved = scope;
 
 	if (init) {
 		init = false;
 	} else {
-		cout << "Criando novo Escopo";
-		scope = new Env(&scope);
+		scope = new Env(scope);
 	}
 
 	Decls(); // decompondo para o proximo	
 	Stmts(); // decompondo para o proximo	
 
 	// voltar pra antigo escopo
-	scope = *saved;
+	scope = saved;
 
-	Match('}'); // Para começar certo
+	Match('}'); // Para comeÃ§ar certo
 	// voltar para o escopo anterior
 }
 
@@ -59,25 +66,26 @@ void Parser::Decls() {
 
 void Parser::Decl(){
 	Id type = *(Id*)lookahead;
-	// string tipo = type->name;
+	int actuaLine = analex.getLine();
 	lookahead = analex.Scan();
 	if (lookahead->tag == ID){
 		Id id = *(Id*)lookahead;
+		actuaLine = analex.getLine();
 		lookahead = analex.Scan();
-		Match(';');
+		Match(';',actuaLine);
 
-		// Eis o momento de carregar as variáveis na tabela de simbolos
+		// Eis o momento de carregar as variï¿½veis na tabela de simbolos
 
 		Symbol s{id.name,type.name};
 
-		if(!scope.get(id.name)) {
-			scope.put(id.name,s);
+		if(!scope->search(id.name)) {
+			scope->put(id.name,s);
 		} else {
-			throw "Erro de sintaxe na linha: " + to_string(analex.getLine()) + "\nDeclaração '"+id.name+"' duplicada no escopo\n";			
+			throw "Erro de sintaxe na linha: " + to_string(actuaLine) + "\nDeclaraÃ§Ã£o '"+id.name+"' duplicada no escopo\n";			
 		}
 
 	} else {
-		throw "Erro de sintaxe na linha: " + to_string(analex.getLine()) + "\nDeclaração '"+type.name+"' incompleta\n";
+		throw "Erro de sintaxe na linha: " + to_string(actuaLine) + "\nDeclaraÃ§Ã£o '"+type.name+"' incompleta\n";
 	}
 }
 
@@ -99,18 +107,14 @@ void Parser::Stmts(){
 }
 
 void Parser::Stmt(){
-	// lookahead = analex.Scan();
-	// cout << "Chegou aqui stmt entrada";
 	if ('{' == lookahead->tag) {
 		Block(); // decompondo para o proximo
 	} else {
+		int lastLine = analex.getLine();
 		Expr(); // decompondo para o proximo
-		Match(';'); // terminando certo
-		// cout << "Chegou aqui expr saida";
+		Match(';',lastLine); // terminando certo
 		cout << endl;
-		// cout << "Chegou aqui o barra n";
 	}
-	// cout << "Chegou aqui stmt saida";
 }
 
 void Parser::Expr()
@@ -164,11 +168,11 @@ void Parser::Factor() {
 	switch (lookahead->tag) {
 		case ID:
 			{
-				// procurar nos escopos e cuspir informações
+				// procurar nos escopos informaÃ§Ãµees
 				Id i = *(Id*)lookahead;
-				// ver se tem operador para cuspir e o fazer
-				found = scope.get(i.name);
-				if (!found) { // adicionar conclusao que foi declarada
+				// ver se tem operador e o mostrar-lo
+				found = scope->get(i.name);
+				if (!found) { // conclusao que foi declarada
 					throw "Erro de sintaxe na linha: "+ to_string(analex.getLine()) + "\n" + i.name + " foi declarada?\n";
 				} else {
 					cout << '(' << found->classtype << ':' << found->name << ")";
@@ -178,7 +182,7 @@ void Parser::Factor() {
 			}
 		case NUM:
 			{
-				// cuspir informações
+				// informaÃ§Ãµes
 				Num n = *(Num*)lookahead;
 				cout << '(' << n.value << ')';
 				// ver se tem operador para cuspir e o fazer
