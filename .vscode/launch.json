@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch Tradutor",
+            "name": "(gdb) Launch Postfix",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/tradutor.out",
+            "program": "${workspaceFolder}/Debug/Postfix",
             "args": [
-                "${workspaceFolder}/bin/teste.exp"
+                "${workspaceFolder}/data/teste.exp"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -24,7 +24,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build tradutor"
+            "preLaunchTask": "make debug"
         }
     ]
 }
