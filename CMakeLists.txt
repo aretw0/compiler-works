@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.0.0)
+project(Postfix)
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_STANDARD 11)
+set(SRC_DIR src)
+set(SOURCE_FILES ${SRC_DIR}/postfix.cpp ${SRC_DIR}/parser.cpp ${SRC_DIR}/lexer.cpp ${SRC_DIR}/env.cpp)
+add_executable(${PROJECT_NAME} ${SOURCE_FILES})
